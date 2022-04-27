@@ -21,13 +21,4 @@ class ComparatorFilesTest {
         assertEquals(3, diff.size());
     }
 
-    @Test
-    void copyFilesStartWith() throws IOException {
-        String dir="E:\\data\\2022\\geovast3d\\korber\\final\\cads\\stp\\";
-        String dest="E:\\data\\2022\\geovast3d\\korber\\final\\usable_cads\\";
-        String source="E:\\data\\2022\\geovast3d\\korber\\final\\common2.txt";
-
-        ComparatorFiles.copyFilesStartWith(source,dir,dest);
-
-    }
 }
