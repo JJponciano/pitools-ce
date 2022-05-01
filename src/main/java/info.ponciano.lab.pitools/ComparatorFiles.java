@@ -67,7 +67,7 @@ public class ComparatorFiles {
     }
     public static void copyFilesStartWith(String startwithfile, String dir, String dest) throws IOException {
         List<String> startw = PiTools.readAllLines(startwithfile);
-        List<String> files = PiTools.ls(new File(dir), "*", true);
+        List<String> files = PiTools.lsName(new File(dir), "*", true);
 
         for (String f : files) {
             boolean startwith=false;
