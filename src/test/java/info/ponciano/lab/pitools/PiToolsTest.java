@@ -2,6 +2,8 @@ package info.ponciano.lab.pitools;
 
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class PiToolsTest {
@@ -44,5 +46,12 @@ class PiToolsTest {
 
     @Test
     void ls() {
+        File dirTest=new File("test_pitools");
+        dirTest.mkdir();
+        PiTools.writeTextFile(dirTest.getPath()+"/t1.txt","file 1\n for testing");
+    }
+
+    @Test
+    void testLs() {
     }
 }
