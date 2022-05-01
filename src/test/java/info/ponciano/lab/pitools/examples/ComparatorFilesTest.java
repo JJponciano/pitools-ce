@@ -1,5 +1,6 @@
-package info.ponciano.lab.pitools;
+package info.ponciano.lab.pitools.examples;
 
+import info.ponciano.lab.pitools.PiTools;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
