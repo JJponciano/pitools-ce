@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * This class helps in data science analysis based on CSV file.
@@ -33,7 +34,8 @@ public class Datanalyse {
             String[][] data = PiTools.readCSV(csv.getPath(), ",");
             // fist value is the category, second value the id reference, third the id for the comparison, and fourth the comparison value
             for (String[] row : data) {
-                Category cat = new Category(row[0]);
+                String cname = row[0].toLowerCase().replaceAll("\\s","_");
+                Category cat = new Category(cname);
                 if (!categories.contains(cat)) categories.add(cat);
                 else cat = this.categories.get(this.categories.indexOf(cat));
                 String refid = row[1];
@@ -49,12 +51,12 @@ public class Datanalyse {
     }
 
     public static void main(String[] args) {
-        String dir="C:\\Users\\49151\\Documents\\data\\best_results";
-        String res="C:\\Users\\49151\\Documents\\data\\best_results_analyse";
+        String dir="C:\\Users\\49151\\Documents\\data\\full_benchmark\\results_full";
+        String res="C:\\Users\\49151\\Documents\\data\\full_benchmark\\results_analyse";
         String []excepted={"1347382-000-01" ,"1355565-000-00","1395819-000-00","1531788-003-00","1592582-000-00","1592582-000-01"};
         Datanalyse csv=new Datanalyse();
         try {
-            csv.loadCSV(dir, false,excepted);
+            csv.loadCSV(dir, true,excepted);
             csv.save(res,excepted);
         } catch (IOException e) {
             e.printStackTrace();

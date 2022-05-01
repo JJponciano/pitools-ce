@@ -8,6 +8,9 @@ public class Category {
     public final Map<String, List<Individual>> individuals;
     Map<String, Integer> positions;
     Map<Integer, Integer> statistics;
+    private int total;
+    private int top10;
+    private int top20;
 
     public Category(String name) {
         this.name = name;
@@ -32,9 +35,11 @@ public class Category {
             int index = individuals.indexOf(ind);
             Individual individual = individuals.get(index);
             double min = Math.min(ind.getValue(), individual.getValue());
-            if(DEBUG)
-                System.out.println("Update of  " + individual + " by "+ ind+ " -> "+min);
-            individual.setValue(min);
+            if(min>=0){
+                if(DEBUG)
+                    System.out.println("Update of  " + individual + " by "+ ind+ " -> "+min);
+                individual.setValue(min);
+            }
         }else
         individuals.add(ind);
 
@@ -82,13 +87,29 @@ public class Category {
                 positions.put(k, ind);
             }
         });
-
         this.statistics = new HashMap<>();
         this.positions.values().forEach(p -> {
             if (!this.statistics.containsKey(p))
                 this.statistics.put(p, 0);
             this.statistics.put(p, this.statistics.get(p) + 1);
         });
+        Iterator<Integer> iterator = this.statistics.keySet().iterator();
+
+        this.total=0;
+        this.top10=0;
+        this.top20=0;
+        while (iterator.hasNext()){
+            Integer next = iterator.next();
+            if(next>=0){
+                Integer numbers = this.statistics.get(next);
+                total+= numbers;
+                if(next<20)top20+=numbers;
+                if(next<10)top10+=numbers;
+
+            }
+
+        }
+
     }
 
     public static Category merge(String name, List<Category> cats, String... excluding) {
@@ -108,7 +129,10 @@ public class Category {
     public String toString() {
         final StringBuilder r = new StringBuilder("Name: " + name);
         if (this.positions != null) {
-            r.append("\n\nSTATISTICS:\n\n");
+            r.append("\n\nSTATISTICS on "+ total +" scans\n");
+            r.append("Top 10: "+ top10 +" corresponding to "+(top10*100)/total+"% \n");
+            r.append("Top 20: "+ top20 +" corresponding to "+(top20*100)/total+"% \n");
+
             this.statistics.forEach((k, p) -> r.append(k).append(",").append(p).append("\n"));
             r.append("\n\nPosition:\n\n");
             this.positions.forEach((k, p) -> r.append(k).append(",").append(p).append("\n"));
