@@ -1,7 +1,5 @@
 package info.ponciano.lab.pitools;
 
-import org.jetbrains.annotations.NotNull;
-
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
@@ -311,17 +309,74 @@ public class PiTools {
      * or if no names were accepted by the filter. Returns {@code null} if this
      * abstract pathname does not denote a directory, or if an I/O error occurs.
      */
-    public static  List<String> ls(final File directory,final String ext,boolean recursive) {
+    public static  List<String> lsName(final File directory, final String ext, boolean recursive) {
         final List<String> result = new ArrayList<>();
         final String[] listFile = directory.list();
         if (listFile!=null)
         for (final String listFile1 : listFile) {
             final File file = new File(directory.getPath() + "/" + listFile1);
             if (recursive&&file.isDirectory()) {
-                result.addAll(ls(file, ext, true));
+                result.addAll(lsName(file, ext, true));
             } else {
                 if (ext.equals("*") || file.getName().endsWith(ext)) {
                     result.add(file.getName());
+                }
+            }
+        }
+        return result.stream().sorted().toList();
+    }
+    /**
+     * Returns a list of strings path of the files and directories in the
+     * directory denoted by this abstract pathname that satisfy the specified
+     * filter. Names are sorted in alphabetical order
+     *
+     * @param ext extension of the file without ".", "*" for no filtering.
+     * @param recursive True for recursive listing, false otherwise.
+     * @return A list of strings naming the files and directories in the
+     * directory denoted by this abstract pathname that were accepted by the
+     * given {@code filter}. The array will be empty if the directory is empty
+     * or if no names were accepted by the filter. Returns {@code null} if this
+     * abstract pathname does not denote a directory, or if an I/O error occurs.
+     */
+    public static  List<String> lsPath(final File directory, final String ext, boolean recursive) {
+        final List<String> result = new ArrayList<>();
+        final String[] listFile = directory.list();
+        if (listFile!=null)
+        for (final String listFile1 : listFile) {
+            final File file = new File(directory.getPath() + "/" + listFile1);
+            if (recursive&&file.isDirectory()) {
+                result.addAll(lsPath(file, ext, true));
+            } else {
+                if (ext.equals("*") || file.getName().endsWith(ext)) {
+                    result.add(file.getPath());
+                }
+            }
+        }
+        return result.stream().sorted().toList();
+    } /**
+     * Returns a list of files and directories in the
+     * directory denoted by this abstract pathname that satisfy the specified
+     * filter. Names are sorted in alphabetical order
+     *
+     * @param ext extension of the file without ".", "*" for no filtering.
+     * @param recursive True for recursive listing, false otherwise.
+     * @return A list of strings naming the files and directories in the
+     * directory denoted by this abstract pathname that were accepted by the
+     * given {@code filter}. The array will be empty if the directory is empty
+     * or if no names were accepted by the filter. Returns {@code null} if this
+     * abstract pathname does not denote a directory, or if an I/O error occurs.
+     */
+    public static  List<File> lsFiles(final File directory, final String ext, boolean recursive) {
+        final List<File> result = new ArrayList<>();
+        final String[] listFile = directory.list();
+        if (listFile!=null)
+        for (final String listFile1 : listFile) {
+            final File file = new File(directory.getPath() + "/" + listFile1);
+            if (recursive&&file.isDirectory()) {
+                result.addAll(lsFiles(file, ext, true));
+            } else {
+                if (ext.equals("*") || file.getName().endsWith(ext)) {
+                    result.add(file);
                 }
             }
         }
