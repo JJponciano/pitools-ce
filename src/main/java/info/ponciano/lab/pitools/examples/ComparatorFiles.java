@@ -1,5 +1,8 @@
-package info.ponciano.lab.pitools;
+package info.ponciano.lab.pitools.examples;
 
+import info.ponciano.lab.pitools.PiTools;
+
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 import java.io.IOException;
@@ -16,10 +19,10 @@ public class ComparatorFiles {
      * @param path1 path of the first file to compare
      * @param path2 path of the second file to compare
      * @param getCommon true to get only common content, false to get only the different content.
-     * @param nbcharacters number of first character use to create the prefix for the comparison for each line (0 for complet matching)
+     * @param characters number of first character use to create the prefix for the comparison for each line (0 for complet matching)
      * @return list of the prefixes that are common or different to the second file
      */
-    public static List<String> compareLines(String path1, String path2, int nbcharacters,boolean getCommon) throws IOException {
+    public static List<String> compareLines(String path1, String path2, int characters,boolean getCommon) throws IOException {
         List<String> common=new ArrayList<>();
         // read files
         List<String> l1 = PiTools.readAllLines(path1);
@@ -28,8 +31,8 @@ public class ComparatorFiles {
         for (String l:l1) {
             String prefix;
             //get the prefix
-            if(nbcharacters>0&&nbcharacters<l.length())
-                prefix=l.substring(0,nbcharacters);
+            if(characters>0&&characters<l.length())
+                prefix=l.substring(0,characters);
             else
                 prefix=l;
             //get the matching
@@ -53,14 +56,16 @@ public class ComparatorFiles {
         String f1 = PiTools.dialogOpenFile(null, new FileNameExtensionFilter("txt","txt"), "");
         String f2 = PiTools.dialogOpenFile(null, new FileNameExtensionFilter("txt","txt"), f1);
         try {
-            List<String> common = ComparatorFiles.compareLines(f1, f2, 14,false);
+            // compare results and get common point if true, different if false
+            int selection = JOptionPane.showConfirmDialog(null, "Do you want to extract common lines? ", "Selection", JOptionPane.YES_NO_OPTION);
+            List<String> common = ComparatorFiles.compareLines(f1, f2, 14,selection==0);
             String s = PiTools.dialogSaveFile(null, new FileNameExtensionFilter("txt","txt"),f2);
             StringBuilder results= new StringBuilder(common.size() + "\n");
             for (String l : common) {
                 results.append(l).append("\n");
             }
             PiTools.writeTextFile(s, results.toString());
-
+            JOptionPane.showMessageDialog(null,"File saved:"+s);
         } catch (IOException e) {
             e.printStackTrace();
         }
