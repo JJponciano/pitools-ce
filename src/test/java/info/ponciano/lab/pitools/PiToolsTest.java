@@ -57,8 +57,8 @@ class PiToolsTest {
         PiTools.writeTextFile(dirTest2.getPath()+"/t3.txt","file 4\n for testing");
         PiTools.writeTextFile(dirTest2.getPath()+"/t3.xyz","file 5\n for testing");
 
-        List<String> results = PiTools.ls(dirTest, "txt", true);
-        List<String> resultsNR = PiTools.ls(dirTest, "txt", false);
+        List<String> results = PiTools.lsName(dirTest, "txt", true);
+        List<String> resultsNR = PiTools.lsName(dirTest, "txt", false);
         assertEquals(3, results.size());
         assertEquals(2, resultsNR.size());
 
