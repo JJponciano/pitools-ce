@@ -299,9 +299,9 @@ public class PiTools {
 
     }
     /**
-     * Returns a list of strings naming the files and directories in the
+     * Returns a list of strings naming (NOT PATH) the files and directories in the
      * directory denoted by this abstract pathname that satisfy the specified
-     * filter.
+     * filter. Names are sorted in alphabetical order
      *
      * @param ext extension of the file without ".", "*" for no filtering.
      * @param recursive True for recursive listing, false otherwise.
@@ -325,7 +325,7 @@ public class PiTools {
                 }
             }
         }
-        return result;
+        return result.stream().sorted().toList();
     }
 
 

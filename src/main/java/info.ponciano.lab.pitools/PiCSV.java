@@ -1,5 +1,6 @@
 package info.ponciano.lab.pitools;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -7,7 +8,7 @@ import java.util.List;
  */
 public class PiCSV {
 
-    public static List<Files> loadCSV(String directory,boolean recursive){
-        PiTools.ls()
+    public static List<File> loadCSV(String directory, boolean recursive){
+        return null;
     }
 }
