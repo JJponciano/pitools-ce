@@ -32,7 +32,7 @@ public class PiWorkspace {
     }
 
     /**
-     * Loads the directory of the workspace automaticaly and creates new
+     * Loads the directory of the workspace automatically and creates new
      * instance of <code>PiWorkspace</code>
      *
      */
@@ -52,7 +52,7 @@ public class PiWorkspace {
     private void load() throws PiWException {
         try {
             this.dir =PiTools.readTextFile(WORKSPACE);
-        } catch (FileNotFoundException ex) {
+        } catch (Exception ex) {
             throw new PiWException("No workspace is defined");
         }
     }
