@@ -235,9 +235,9 @@ public class PiTools {
      */
     public static String readTextFile(String path) throws FileNotFoundException {
         // test if the file exists
-        if (new File(path).exists())// if it does not exists throws a exception.
+        if (!new File(path).exists())// if it does not exist throws an exception.
         {
-            throw new java.io.FileNotFoundException("the file with the path " + path + " does not found");
+            throw new java.io.FileNotFoundException("the file with the path " + path + " is not found");
         } else {
             try {
                 return readTextBuffer(path);
