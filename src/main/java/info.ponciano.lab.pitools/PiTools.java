@@ -7,7 +7,9 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -173,7 +175,56 @@ public class PiTools {
      */
     public static String[][] readCSV(final String path,final String separator) throws IOException {
         final List<String> lines = readAllLines(path);
-        return extractedCSV(separator, lines);
+        return extractCSV(separator, lines);
+    }
+    /**
+     * Remove column that has a header equals to an element of the
+     * {@code exeptedColumne}
+     *
+     * @param exeptedColumne
+     * @return array representing the CSV with the specified columns removed
+     */
+    public static String[][] removeColumn(String[][] csv, List<String> exeptedColumne) {
+
+        if (exeptedColumne == null || exeptedColumne.isEmpty()) {
+            return csv;
+        }
+
+        // extract allowed header
+        List<String> header = new ArrayList<>();
+        for (String h : csv[0]) {
+            boolean isOK = !exeptedColumne.contains(h) && !header.contains(h);
+            for (String e : exeptedColumne) {
+                if (h.contains(e)) {
+                    isOK = false;
+                    break;
+                }
+            }
+            if (isOK) {
+                header.add(h);
+            }
+        }
+        // create the new CSV
+        String[][] csvCleaned = new String[csv.length][header.size()];
+        for (int i = 0; i < csv.length; i++) {// read csv line
+            int k = 0;
+            for (int j = 0; j < csv[i].length; j++) {// read csv column
+                // get the header corresponding to the actual value
+                String h = csv[0][j];
+                // if the header is not forbidden
+                if (header.contains(h)) {
+                    // get the value
+                    String v = csv[i][j];
+                    // add the value to the new csv
+                    csvCleaned[i][k] = v;
+                    k++;
+                }
+
+            }
+
+        }
+        return csvCleaned;
+
     }
 
     /**
@@ -195,9 +246,82 @@ public class PiTools {
         }
         return buff;
     }
-    private  static String[][] extractedCSV(final String separator, final List<String> lines) throws IOException {
+    /**
+     *
+     * Writes an array in a CSV file
+     *
+     * @param path path of the file.
+     * @param array array to be written.
+     * @param separator character used to separated value
+     * @param header column headers of the array.
+     */
+    public static void writesCSV(final String path, final String[][] array, final String separator,
+                                 final String... header) {
+        String write = "";
+
+        for (int i = 0; i < header.length; i++) {
+            write += header[i];
+            if (i + 1 < header.length) {
+                write += separator;
+            }
+        }
+        write += "\n";
+        for (String[] array1 : array) {
+            for (int j = 0; j < array1.length; j++) {
+                write += array1[j];
+                if (j + 1 < array1.length) {
+                    write += separator;
+                }
+            }
+            write += "\n";
+        }
+        PiTools.writeTextFile(path,write);
+    }
+
+    /**
+     *  Writes a Map in a CSV file
+     * @param output path of the file.
+     * @param separator character used to separated value
+     * @param header  column headers of the array.
+     * @param data data to saved
+     */
+    public void writeCSV(String output, final char separator, List<String> header, Map<String, Map<String, String>> data) {
+        FileWriter myWriter = null;
+        try {
+            myWriter = new FileWriter(output);
+            String h = "id";
+            for (int i = 0; i < header.size(); i++) {
+                String p = header.get(i);
+                h += separator + p;
+            }
+            myWriter.write(h + System.lineSeparator());
+
+
+            Iterator<String> iterator = data.keySet().iterator();
+            while (iterator.hasNext()) {
+                String id = iterator.next();
+                String row = id;
+                for (int i = 0; i < header.size(); i++) {
+                    String p = header.get(i);
+                    row += separator + data.get(id).get(p);
+                }
+                myWriter.write(row + System.lineSeparator());
+            }
+            myWriter.close();
+        } catch (IOException ex) {
+            Logger.getLogger(PiTools.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            try {
+                myWriter.close();
+            } catch (IOException ex) {
+                Logger.getLogger(PiTools.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }
+
+    public  static String[][] extractCSV(final String separator, final List<String> lines) {
         if (lines.isEmpty()) {
-            throw new IOException("file empty, no line to read");
+           return null;
         }
         // remove empty line
         for (int i = 0; i < lines.size(); i++) {
@@ -405,5 +529,75 @@ public class PiTools {
         else {
             System.out.println("Directory not deleted");
         }
+    }
+    /**
+     * Serializes object in a file.
+     *
+     * @param <T> Type of object to be serialized
+     * @param object object to be saved.
+     */
+    public static<T> void save(String path,final T object) {
+        // initialization of the stream.
+        ObjectOutputStream oos = null;
+        try {
+            // get the final file
+            final FileOutputStream fichier = new FileOutputStream(path);
+            // open the stream from the file
+            oos = new ObjectOutputStream(fichier);
+
+            // write the object
+            oos.writeObject(object);
+        } catch (final java.io.IOException e) {
+            System.err.println(e);
+        } finally {
+            try {
+                if (oos != null) {
+                    // empty the buffer
+                    oos.flush();
+                    // close the file
+                    oos.close();
+                }
+            } catch (final IOException ex) {
+                System.err.println(ex);
+            }
+        }
+    }
+
+    /**
+     * Gets a object serialized in the file
+     *
+     * @param <T> Type of object to be loaded.
+     * @return the object serialized or null if something wrong.
+     * @throws FileNotFoundException If the file does not exist, is a directory
+     * rather than a regular file, or for some other reason cannot be opened for
+     * reading .
+     */
+    public static <T> T load(String path) throws FileNotFoundException {
+
+        // test if the file exists
+        if (!new File(path).exists()) // if it does not exists throws a exception.
+        {
+            throw new java.io.FileNotFoundException("the file with the path " + path + "does not found");
+        }
+        ObjectInputStream ois = null;
+        try {
+            final FileInputStream fichier = new FileInputStream(path);
+            ois = new ObjectInputStream(fichier);
+            @SuppressWarnings("unchecked")
+            final T object = (T) ois.readObject();
+            ois.close();
+            return object;
+        } catch (final java.io.IOException | ClassNotFoundException e) {
+            System.err.println(e);
+        } finally {
+            try {
+                if (ois != null) {
+                    ois.close();
+                }
+            } catch (final IOException ex) {
+                System.err.println(ex);
+            }
+        }
+        return null;
     }
 }
