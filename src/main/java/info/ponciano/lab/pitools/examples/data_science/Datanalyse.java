@@ -12,7 +12,7 @@ import java.util.Locale;
  * This class helps in data science analysis based on CSV file.
  */
 public class Datanalyse {
-    private final List<Category> categories;
+    private  List<Category> categories;
 
     public Datanalyse() {
         this.categories = new ArrayList<>();
@@ -43,16 +43,17 @@ public class Datanalyse {
                     String id = row[i];
                     i++;
                     double value = Double.parseDouble(row[i]);
-                    cat.add(refid, id, value);
+                    cat.add(refid, id, value,false);
                 }
             }
         }
+        this.categories=Category.mergeMeanStd(this.categories);
         this.categories.forEach(c->{c.sort();c.calculateMetrics(7,excepted);});
     }
 
     public static void main(String[] args) {
-        String dir="C:\\Users\\49151\\Documents\\data\\full_benchmark\\results_full";
-        String res="C:\\Users\\49151\\Documents\\data\\full_benchmark\\results_analyse";
+        String dir="C:\\Users\\49151\\Documents\\data\\full_benchmark\\RESULTS\\icp\\icp_results\\icp_results\\";
+        String res=dir+"rf\\";
         String []excepted={"1347382-000-01" ,"1355565-000-00","1395819-000-00","1531788-003-00","1592582-000-00","1592582-000-01"};
         Datanalyse csv=new Datanalyse();
         try {
