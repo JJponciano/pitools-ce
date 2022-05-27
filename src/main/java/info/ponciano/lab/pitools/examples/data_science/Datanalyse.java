@@ -52,9 +52,9 @@ public class Datanalyse {
     }
 
     public static void main(String[] args) {
-        String dir="C:\\Users\\49151\\Documents\\data\\full_benchmark\\RESULTS\\icp\\icp_results\\icp_results\\";
+        String dir="results\\";
         String res=dir+"rf\\";
-        String []excepted={"1347382-000-01" ,"1355565-000-00","1395819-000-00","1531788-003-00","1592582-000-00","1592582-000-01"};
+        String []excepted={"qw-01" };
         Datanalyse csv=new Datanalyse();
         try {
             csv.loadCSV(dir, true,excepted);
