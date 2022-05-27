@@ -58,7 +58,7 @@ public class ComparatorFiles {
         try {
             // compare results and get common point if true, different if false
             int selection = JOptionPane.showConfirmDialog(null, "Do you want to extract common lines? ", "Selection", JOptionPane.YES_NO_OPTION);
-            List<String> common = ComparatorFiles.compareLines(f1, f2, 14,selection==0);
+            List<String> common = ComparatorFiles.compareLines(f1, f2, 11,selection==0);
             String s = PiTools.dialogSaveFile(null, new FileNameExtensionFilter("txt","txt"),f2);
             StringBuilder results= new StringBuilder(common.size() + "\n");
             for (String l : common) {
