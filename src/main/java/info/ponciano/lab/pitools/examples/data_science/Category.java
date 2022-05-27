@@ -3,7 +3,7 @@ package info.ponciano.lab.pitools.examples.data_science;
 import java.util.*;
 
 public class Category {
-    private final static boolean DEBUG=false;
+    private final static boolean DEBUG = false;
     public final String name;
     public final Map<String, List<Individual>> individuals;
     Map<String, Integer> positions;
@@ -25,24 +25,31 @@ public class Category {
         return individuals;
     }
 
-    public void add(String refID, String comparedID, double value) {
+    public void add(String refID, String comparedID, double value, boolean mean) {
+        if (this.name.equals("size")) value = 1 - value;
         Individual ind = new Individual(refID, comparedID, value);
         if (!this.individuals.containsKey(refID)) {
             this.individuals.put(refID, new ArrayList<>());
         }
         List<Individual> individuals = this.individuals.get(refID);
-        if(individuals.contains(ind)){
+        if (individuals.contains(ind)) {
             int index = individuals.indexOf(ind);
             Individual individual = individuals.get(index);
-            double min = Math.min(ind.getValue(), individual.getValue());
-            if(min>=0){
-                if(DEBUG)
-                    System.out.println("Update of  " + individual + " by "+ ind+ " -> "+min);
-                individual.setValue(min);
+            double new_val;
+            if (mean) {
+                new_val = (individual.getValue() + ind.getValue()) / 2.0;
+            } else {
+                double min = Math.min(ind.getValue(), individual.getValue());
+                if (min >= 0) {
+                    if (DEBUG)
+                        System.out.println("Update of  " + individual + " by " + ind + " -> " + min);
+                    individual.setValue(min);
+                }
+                new_val = min;
             }
-        }else
-        individuals.add(ind);
-
+            individual.setValue(new_val);
+        } else
+            individuals.add(ind);
     }
 
     @Override
@@ -65,12 +72,12 @@ public class Category {
     }
 
     public void calculateMetrics(int charComparisonCount, String... ignored) {
-        List<String> excepted=List.of(ignored);
+        List<String> excepted = List.of(ignored);
         this.positions = new HashMap<>();
         this.individuals.forEach((k, v) -> {
-            if(excepted.contains(k)) {
+            if (excepted.contains(k)) {
                 System.out.println("Excepted: " + k);
-            }else{
+            } else {
                 //get the first index of
                 int ind = -1;
                 int i = 0;
@@ -95,16 +102,16 @@ public class Category {
         });
         Iterator<Integer> iterator = this.statistics.keySet().iterator();
 
-        this.total=0;
-        this.top10=0;
-        this.top20=0;
-        while (iterator.hasNext()){
+        this.total = 0;
+        this.top10 = 0;
+        this.top20 = 0;
+        while (iterator.hasNext()) {
             Integer next = iterator.next();
-            if(next>=0){
+            if (next >= 0) {
                 Integer numbers = this.statistics.get(next);
-                total+= numbers;
-                if(next<20)top20+=numbers;
-                if(next<10)top10+=numbers;
+                total += numbers;
+                if (next <= 20) top20 += numbers;
+                if (next <= 10) top10 += numbers;
 
             }
 
@@ -112,14 +119,39 @@ public class Category {
 
     }
 
+    public static List<Category> mergeMeanStd(List<Category> cats) {
+        List<Category> cats_mstd = new ArrayList<>();
+        cats_mstd.add(new Category("iss"));
+        cats_mstd.add(new Category("icp"));
+        cats_mstd.add(new Category("ch"));
+        Category catsize=null;
+        for(Category category:cats){
+            if (category.getName().equals("size")) {
+                catsize=category;
+            }else
+            category.getIndividuals().values().forEach((individuals) -> individuals.forEach(individual -> {
+                cats_mstd.forEach(c -> {
+                    if (category.getName().toLowerCase().contains(c.getName())) {
+                        //ad the individual to the categorie
+                        // if the individuals does not exists
+                        c.add(individual.getReferenceID(), individual.getId(), individual.getValue(), true);
+                    }
+                });
+
+            }));
+        }
+        cats_mstd.add(catsize);
+        return cats_mstd;
+    }
+
     public static Category merge(String name, List<Category> cats, String... excluding) {
         List<String> exclude = List.of(excluding);
         Category cat = new Category(name);
         cats.forEach(category -> {
             if (!exclude.contains(category.name))
-                category.getIndividuals().values().forEach((individuals) -> individuals.forEach(individual -> cat.add(individual.getReferenceID(), individual.getId(), individual.getValue())));
+                category.getIndividuals().values().forEach((individuals) -> individuals.forEach(individual -> cat.add(individual.getReferenceID(), individual.getId(), individual.getValue(), false)));
             else {
-                System.out.println(category.name+" excluded");
+                System.out.println(category.name + " excluded");
             }
         });
         return cat;
@@ -129,9 +161,9 @@ public class Category {
     public String toString() {
         final StringBuilder r = new StringBuilder("Name: " + name);
         if (this.positions != null) {
-            r.append("\n\nSTATISTICS on "+ total +" scans\n");
-            r.append("Top 10: "+ top10 +" corresponding to "+(top10*100)/total+"% \n");
-            r.append("Top 20: "+ top20 +" corresponding to "+(top20*100)/total+"% \n");
+            r.append("\n\nSTATISTICS on " + total + " scans\n");
+            r.append("Top 10: " + top10 + " corresponding to " + (top10 * 100) / total + "% \n");
+            r.append("Top 20: " + top20 + " corresponding to " + (top20 * 100) / total + "% \n");
 
             this.statistics.forEach((k, p) -> r.append(k).append(",").append(p).append("\n"));
             r.append("\n\nPosition:\n\n");
